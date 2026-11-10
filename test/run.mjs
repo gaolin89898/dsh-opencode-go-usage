@@ -7,4 +7,5 @@ import "./config.test.mjs";
 import "./usage.test.mjs";
 import "./settings.test.mjs";
 import "./fiber.test.mjs";
+import "./provider-usage.test.mjs";
 import "./client.test.mjs";

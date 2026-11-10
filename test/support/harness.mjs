@@ -230,7 +230,7 @@ function responseStub() {
  * Invoke one registered route with a synthetic request.
  * @param {Array<{ path: string, handler: Function }>} routes
  * @param {string} routePath
- * @param {{ method?: string, headers?: Record<string, string>, body?: string }} [request]
+	 * @param {{ method?: string, headers?: Record<string, string>, body?: string, url?: string }} [request]
  */
 export async function callRoute(routes, routePath, request = {}) {
 	const route = routes.find((candidate) => candidate.path === routePath);
@@ -239,6 +239,7 @@ export async function callRoute(routes, routePath, request = {}) {
 	}
 	const req = Readable.from(request.body === undefined ? [] : [Buffer.from(request.body, "utf8")]);
 	req.method = request.method ?? "GET";
+	req.url = request.url ?? routePath;
 	req.headers = request.headers ?? {};
 	const res = responseStub();
 	await route.handler(req, res);

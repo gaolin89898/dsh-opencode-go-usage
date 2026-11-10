@@ -29,6 +29,7 @@ to do on any other runtime.
 
 ## Features
 
+- **Follow the current provider**: on DSH versions exposing `modelDirectories`, changing the current session's model, provider, or session immediately switches the widget to the matching quota or balance. Late responses from the previous selection are discarded.
 - **Quota source** — by default the widget reads the **currently active account** of the `dsh-opencode-go` plugin through that plugin's `opencodeGoUsage` host service, so the numbers track the same account its own settings page shows (including automatic account switches). If that plugin is not installed, disabled, incompatible, or its usage read fails, the widget falls back to the built-in provider (`baseUrl` + `/v1/usage` with the `apiKeyEnv` credential) and marks the result. `quotaSource: builtin` pins the built-in path. See [Quota source and fallback](#quota-source-and-fallback).
 - **Bundle settings page** — a configuration page in the `plugins.bundle.config` slot (sidebar **Plugins** panel → this bundle's card): pick the quota source and see the live detection status (dsh-opencode-go version, active account, effective source, fallback reason). It coexists with Settings → Plugins → Plugin configuration; see [Settings page](#settings-page).
 - **Sidebar widget** — a live widget pinned at the bottom of the DSH web sidebar (`sidebar.footer.action` slot) showing three usage bars: rolling (5h), weekly, and monthly, each with a relative countdown to its window reset. When the sidebar is collapsed it shrinks to a compact percentage badge.
@@ -36,6 +37,21 @@ to do on any other runtime.
 - **`/opencode-go` chat command** — prints the same numbers as text inside any conversation.
 - **Same-origin proxy** — the host registers `GET /opencode-go/usage`, which reads the quota through `dsh-opencode-go` (default) or forwards to the official GO gateway with your API key. The key never reaches the browser and no CORS is involved.
 - **`x-opencode-session` fix** — at runtime, injects the real harness session id into OpenCode GO gateway chat requests (the gateway 400s requests without it). No DSH file patching; survives upgrades.
+
+## Provider Balances
+
+| Provider | Display |
+|---|---|
+| OpenCode GO | Rolling, weekly and monthly usage with reset times |
+| MiniMax CN / global | Rolling and weekly usage returned by the Coding Plan endpoint; no invented monthly quota or reset times |
+| DeepSeek API / signed-in account | Available balance per currency; account balances include recharge and bonus wallets |
+| OpenRouter | Total credits minus total usage |
+| Moonshot CN / global | Available balance |
+| Other providers or custom proxies | Balance lookup unavailable |
+
+The widget calls `GET /opencode-go/usage?provider=<route>&model=<model>`. The Host resolves credentials from the selected provider's live configuration, rather than inferring a provider from the model name. Cache entries are separate for each provider, model and credential; keys never reach the browser. Missing credentials, signed-out accounts and failed requests have distinct states.
+
+A GO route configured in `llm-pi-ai` uses that route's credential. The original GO source settings are reused only when the account and gateway match. Older DSH versions without the selection service, requests without query parameters, and the `/opencode-go` command retain the original GO source behavior.
 
 ## Quota source and fallback
 
