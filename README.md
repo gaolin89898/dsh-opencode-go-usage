@@ -209,7 +209,7 @@ DSH `0.1.7-rc` 起通过官方 client-modules 扫描装载组件：包的 `dsh.c
 
 | 插件版本 | DSH 运行时 | host 端 | 浏览器端 |
 |---|---|---|---|
-| **1.0.0**（本源码树；版本线在 fork 处重启，能力等同源码树此前的 1.6.0） | `0.1.7` 及以上，含 `0.2.x` 线（已在 `0.2.2-rc.2` 验证） | 同 1.5.0，另加经 `opencodeGoUsage` 的额度来源探测、多服务跟随，以及 `GET` / `POST /opencode-go/settings` 路由 | 同 1.5.0，另加 `plugins.bundle.config` 槽位注册（应用包设置页）与账号 / 回退显示 |
+| **1.0.0**（本源码树；版本线独立重启，能力等同此前源码树的 1.6.0） | `0.1.7` 及以上，含 `0.2.x` 线（已在 `0.2.2-rc.2` 验证） | 同 1.5.0，另加经 `opencodeGoUsage` 的额度来源探测、多服务跟随，以及 `GET` / `POST /opencode-go/settings` 路由 | 同 1.5.0，另加 `plugins.bundle.config` 槽位注册（应用包设置页）与账号 / 回退显示 |
 | 1.5.0 | `0.1.7` 及以上，含 `0.2.0` 线 | loader 读取导出的 `Config` schema；配置取自插件条目（不再调用 `ctx.settings.register` / `settings.get`） | 由 client-modules 依据包的 `dsh.client` 声明自动装配 |
 | 1.4.0 | `0.1.7-rc.1`、`0.1.7-rc.2` | 同 1.5.0 | 同 1.5.0 |
 | 1.3.3 | `0.1.1-rc.2`、`0.1.2-alpha.2`（`0.1.7` 之前的版本线） | `ctx.settings.register` 注册命名空间 + `ctx.settings.get` 读取 | 自托管 bundle 路由 + `webServer.tapIndex` 注入启动图行 |
@@ -266,9 +266,10 @@ node -e "const fs=require('fs');fs.mkdirSync('node_modules/@deepseek-ai',{recurs
 
 ## 项目来源与致谢
 
-- 本仓库（[gaolin89898/dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)）是 [yumusb/dsh-opencode-go-usage](https://github.com/yumusb/dsh-opencode-go-usage) 的 fork 线（早前也曾以 `Astervolans/dsh-opencode-go-usage` 存在）。包名沿用上游的 `@astervolans/dsh-opencode-go-usage`（`package.json` 的 `name` 未改，本地安装的解析名就是它）；**本仓库不发布 npm**——npm 上留有历史版本 1.3.2–1.5.0，新功能请从本地源码目录安装。版本线在 fork 处重启：本源码树为 **1.0.0**。
-- 设置命名空间、HTTP 路由与命令名保持 `dsh-opencode-go-usage` 不变，从上游迁移无需改配置。
-- 相对上游的差异：每条用量条下的**时间条**；**跟随当前服务**的多服务额度 / 余额显示；1.6.0 的**额度来源**（读取 `dsh-opencode-go` 当前账号）与应用包设置页。
+- 本项目（[gaolin89898/dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)）是一个**独立的 DSH 插件**，代码源自 [yumusb/dsh-opencode-go-usage](https://github.com/yumusb/dsh-opencode-go-usage)，在此致谢。
+- 包名沿用 `@astervolans/dsh-opencode-go-usage`（`package.json` 的 `name` 未改，本地安装的解析名就是它）；设置命名空间、HTTP 路由与命令名也保持 `dsh-opencode-go-usage` 不变。
+- **本仓库不发布 npm**——npm 上的 1.3.2–1.5.0 是历史版本；本源码树为 **1.0.0**，版本线从此重启，从本地源码目录安装。
+- 在此基础上的新增：每条用量条下的**时间条**；**跟随当前服务**的多服务额度 / 余额显示；**额度来源**（读取 `dsh-opencode-go` 当前账号）与应用包设置页。
 
 ## License
 
