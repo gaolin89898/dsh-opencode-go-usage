@@ -264,13 +264,6 @@ node -e "const fs=require('fs');fs.mkdirSync('node_modules/@deepseek-ai',{recurs
 - **小组件标题没有账号名** → 正常现象：`dsh-opencode-go` 缺失（回退）或其当前账号没有 `name`；可看接口里的 `account.name` 确认。
 - **启动失败，日志有 `Identifier 'PACKAGE_NAME' has already been declared`** → 客户端 bundle 在 shell 的共享脚本作用域里声明了顶层同名常量（与 `@astervolans/dsh-literature-search` 等插件冲突），整个 web boot 会被判定失败。1.6.x 当前源码已把该名称移入 factory 内部；重新安装本源码并完全重启 DSH 即可。若同时使用 `dsh-literature-search`，也请确保它来自当前版本。
 
-## 项目来源与致谢
-
-- 本项目（[gaolin89898/dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)）是一个**独立的 DSH 插件**，代码源自 [yumusb/dsh-opencode-go-usage](https://github.com/yumusb/dsh-opencode-go-usage)，在此致谢。
-- 包名沿用 `@astervolans/dsh-opencode-go-usage`（`package.json` 的 `name` 未改，本地安装的解析名就是它）；设置命名空间、HTTP 路由与命令名也保持 `dsh-opencode-go-usage` 不变。
-- **本仓库不发布 npm**——npm 上的 1.3.2–1.5.0 是历史版本；本源码树为 **1.0.0**，版本线从此重启，从本地源码目录安装。
-- 在此基础上的新增：每条用量条下的**时间条**；**跟随当前服务**的多服务额度 / 余额显示；**额度来源**（读取 `dsh-opencode-go` 当前账号）与应用包设置页。
-
 ## License
 
 MIT
