@@ -1,11 +1,13 @@
 # 把额度放进侧边栏
 
-**dsh-opencode-go-usage** 是 [DSH](https://github.com/deepseek-ai/deepseek-harness)（DeepSeek Harness）的侧边栏小组件：三条进度条呈现 OpenCode GO 的 5 小时、周与月窗口，每条用量下再叠一条时间条——额度花得快还是慢，一眼可见。
+**[dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)** 是 [DSH](https://github.com/deepseek-ai/deepseek-harness)（DeepSeek Harness）的侧边栏小组件：跟随会话当前所用服务，实时显示对应的额度或余额——OpenCode GO 的 5 小时 / 周 / 月用量窗口，MiniMax 的滚动与周用量，DeepSeek / OpenRouter / Moonshot 的可用余额。每条用量条下再叠一条时间条——额度花得快还是慢，一眼可见。
 
 `DSH ≥ 0.1.7` · `MIT License` · `● v1.6.0 · 源码树`
 
 > [!WARNING]
 > **1.6.0 尚未发布 npm**——「额度来源」与设置页只存在于本源码树；npm 上仍为 1.x（1.5.0）。从本地目录安装即可试用，见 [01 快速开始](#01-快速开始)。
+
+> npm 发布名仍为 `@astervolans/dsh-opencode-go-usage`（沿袭上游命名；设置命名空间、HTTP 路由与命令名也保持不变），来源见[项目来源与致谢](#项目来源与致谢)。
 
 第一次装 DSH 插件？直接看[使用者指南](docs/INSTALL.zh.md)，一步步照做即可。
 
