@@ -2,7 +2,7 @@
 
 **[dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)** 是 [DSH](https://github.com/deepseek-ai/deepseek-harness)（DeepSeek Harness）的侧边栏小组件：跟随会话当前所用服务，实时显示对应的额度或余额——OpenCode GO 的 5 小时 / 周 / 月用量窗口，MiniMax 的滚动与周用量，DeepSeek / OpenRouter / Moonshot 的可用余额。每条用量条下再叠一条时间条——额度花得快还是慢，一眼可见。
 
-`DSH ≥ 0.1.7` · `MIT License` · `● v1.6.0 · 源码树`
+`DSH ≥ 0.1.7` · `MIT License` · `● v1.0.0 · 源码树`
 
 本仓库**不发布 npm**，安装一律从本地源码目录——见 [01 快速开始](#01-快速开始)。
 
@@ -129,7 +129,7 @@ $ dsh web
 | `apiKeyEnv` | `OPENCODE_GO_API_KEY` | API key 的 credential 引用 / 环境变量名（内置路径；`opencode-go` 模式回退时也用它） |
 | `baseUrl` | `https://opencode.ai/zen/go` | 网关 base URL（内置路径） |
 | `cacheMs` | `30000` | host 端上游缓存 TTL |
-| `updateCheck` | `true` | 检查 npm 新版本（组件与命令只提示，插件不会自行升级）；本仓库不再发布 npm，源码安装（1.6.0）高于 npm 上的 1.5.0，该检查不会命中 |
+| `updateCheck` | `false` | 检查 npm 新版本（组件与命令只提示，插件不会自行升级）。默认关闭：本仓库不发布 npm，开启会因 npm 上遗留的 1.5.0 高于 1.0.0 而误报可升级 |
 | `injectSessionHeader` | `true` | 为 GO 网关聊天请求注入运行时 `x-opencode-session` 头 |
 
 也可以直接在 profile patch 里配置：
@@ -163,7 +163,7 @@ $ dsh web
 
 小组件与命令从不直接访问网关，由 host 代理并附加信息。
 
-**`GET /opencode-go/usage`** —— 在 1.5.0 字段（`usage`、`update`、`sessionHeader`）之外，1.6.0 新增：
+**`GET /opencode-go/usage`** —— 在 1.5.0 字段（`usage`、`update`、`sessionHeader`）之外，本源码树新增：
 
 | 字段 | 含义 |
 |---|---|
@@ -209,7 +209,7 @@ DSH `0.1.7-rc` 起通过官方 client-modules 扫描装载组件：包的 `dsh.c
 
 | 插件版本 | DSH 运行时 | host 端 | 浏览器端 |
 |---|---|---|---|
-| **1.6.0**（本源码树） | `0.1.7` 及以上，含 `0.2.0` 线 | 同 1.5.0，另加经 `opencodeGoUsage` 的额度来源探测、多服务跟随，以及 `GET` / `POST /opencode-go/settings` 路由 | 同 1.5.0，另加 `plugins.bundle.config` 槽位注册（应用包设置页）与账号 / 回退显示 |
+| **1.0.0**（本源码树；版本线在 fork 处重启，能力等同源码树此前的 1.6.0） | `0.1.7` 及以上，含 `0.2.x` 线（已在 `0.2.2-rc.2` 验证） | 同 1.5.0，另加经 `opencodeGoUsage` 的额度来源探测、多服务跟随，以及 `GET` / `POST /opencode-go/settings` 路由 | 同 1.5.0，另加 `plugins.bundle.config` 槽位注册（应用包设置页）与账号 / 回退显示 |
 | 1.5.0 | `0.1.7` 及以上，含 `0.2.0` 线 | loader 读取导出的 `Config` schema；配置取自插件条目（不再调用 `ctx.settings.register` / `settings.get`） | 由 client-modules 依据包的 `dsh.client` 声明自动装配 |
 | 1.4.0 | `0.1.7-rc.1`、`0.1.7-rc.2` | 同 1.5.0 | 同 1.5.0 |
 | 1.3.3 | `0.1.1-rc.2`、`0.1.2-alpha.2`（`0.1.7` 之前的版本线） | `ctx.settings.register` 注册命名空间 + `ctx.settings.get` 读取 | 自托管 bundle 路由 + `webServer.tapIndex` 注入启动图行 |
@@ -219,13 +219,13 @@ DSH `0.1.7-rc` 起通过官方 client-modules 扫描装载组件：包的 `dsh.c
 ```json
 "peerDependencies": {
   "@deepseek-ai/schemastery": "^3.18.4",
-  "@deepseek-ai/dsh": ">=0.1.7-rc.1 <0.3.0"
+  "@deepseek-ai/dsh": ">=0.1.7-rc.1 <0.2.0-0 || >=0.2.0 <0.3.0-0 || >=0.2.2-rc.1 <0.3.0-0"
 }
 ```
 
 `dsh-opencode-go` 本身是**可选**的，也没有声明为依赖：`opencode-go` 模式下 host 运行时探测它，没有安装属于正常回退（`not-installed`），不是错误。想让小组件跟随其当前账号，就在同一个 profile 里装上它。
 
-DSH 会在条目启用前用该范围校验当前运行时。从 `0.2.0` 起这是**硬闸门**：所有 `@deepseek-ai/dsh` / `@deepseek-ai/dsh-*` peer 都会带 `includePrerelease` 参与判定，不匹配则**整行被禁用**（宿主日志写 `disabling profile plugin row …`），而不是半死不活地跑着。因此窗口写成 `>=0.1.7-rc.1 <0.3.0`，同时覆盖 `0.1.7` 线与整条 `0.2.0` 线；1.4.0 的写法 `0.1.7-rc.1 || 0.1.7-rc.2` 做不到——任何 `0.1.x` 范围的上界都是 `<0.2.0`。若运行时不在此列，请改装对应版本的插件，或显式接受风险后重启：
+DSH 会在条目启用前用该范围校验当前运行时。从 `0.2.0` 起这是**硬闸门**：所有 `@deepseek-ai/dsh` / `@deepseek-ai/dsh-*` peer 都会带 `includePrerelease` 参与判定，不匹配则**整行被禁用**（宿主日志写 `disabling profile plugin row …`），而不是半死不活地跑着。窗口按 node-semver 的预发布规则写成显式分支：`0.1.7` 线（含 rc）一条、`0.2.x` 稳定版一条、`0.2.2` 预发布一条——宿主的 `includePrerelease` 判定与普通 semver 解析（npm / pnpm）都能通过；单一区间 `>=0.1.7-rc.1 <0.3.0` 看似更宽，但在普通解析下会**静默排除** `0.2.2-rc.x` 这类预发布版。未来 `0.2.x` 的新预发布（如 `0.2.3-rc.1`）在宿主判定下依旧可用，普通解析则需等分支补充。若运行时不在此列，请改装对应版本的插件，或显式接受风险后重启：
 
 ```bash
 dsh plugin allow-version     # 为 name@version 在本 dsh 版本上授予精确版本豁免
@@ -235,14 +235,14 @@ dsh plugin allow-version     # 为 name@version 在本 dsh 版本上授予精确
 
 - **设置页 / 热改 / 旧配置迁移** —— volatile 字段需要 schemastery ≥ `3.18.4`。两个官方包都按约定声明为 peer 而非 dependency，全新安装会解析到 DSH 自带的那份；若 profile 里仍 hoist 着旧的 `3.18.2`，则不会生成设置页、不能热改，旧的 `~/.dsh/settings.yaml` 段落也不会被迁移（留在 `settings.yaml.imported`）。两种情况插件都照常启用，并从 profile 条目读取配置（见[配置项](#配置项)）。
 - **小组件** —— 全程无需手工打包或注入 index：host 依据包的 `dsh.client` 声明装配组件，并从 `/plugins/...` 组合路由提供（见[侧边栏小组件如何加载](#侧边栏小组件如何加载)）。
-- **应用包设置页** —— 1.6.0 的设置页通过 `plugins.bundle.config` 槽位渲染，已在 `0.2.1-rc.4` host（Desktop Next `2.0.21-next`）上验证。若你的运行时不提供该槽位，请改用 设置 → 插件 → 插件配置 或 profile patch 配置 `quotaSource`；小组件与 `/opencode-go` 命令不受影响。
+- **应用包设置页** —— 本源码树的设置页通过 `plugins.bundle.config` 槽位渲染，已在 `0.2.1-rc.4` host（Desktop Next `2.0.21-next`）与 `0.2.2-rc.2` 上验证。若你的运行时不提供该槽位，请改用 设置 → 插件 → 插件配置 或 profile patch 配置 `quotaSource`；小组件与 `/opencode-go` 命令不受影响。
 
 ## 开发
 
 - **测试**：`npm test`（即 `node test/run.mjs`，全部离线运行）。
 - **浏览器端**是手写的 factory bundle（`window.__ModuleLoader__.load`），因为目前第三方 client 插件还没有公开的构建流水线。它只能 `require()` shell 模块表里的模块（`react`、`react/jsx-runtime` 以及已注册的 client 包）。直接改 `lib/client.js`，重启 DSH 并刷新页面——bundle 的 revision hash 会变化，shell 自动加载新文件。
 - **host 端**（`lib/index.js`）的改动只需重启 DSH。
-- 1.6.0 的应用包设置页是同一个 bundle 里的第二处注册（`plugins.bundle.config`，以包名为 key）。组件按 `props.view` 分支：`summary` 必须返回纯字符串（插件面板卡片内联渲染），`page` 才挂载设置组件。两端都走同一组 `/opencode-go/...` 路由——设置页不直接读配置，而是经 `GET` / `POST /opencode-go/settings`。
+- 本源码树的应用包设置页是同一个 bundle 里的第二处注册（`plugins.bundle.config`，以包名为 key）。组件按 `props.view` 分支：`summary` 必须返回纯字符串（插件面板卡片内联渲染），`page` 才挂载设置组件。两端都走同一组 `/opencode-go/...` 路由——设置页不直接读配置，而是经 `GET` / `POST /opencode-go/settings`。
 
 ### 本地 link 安装的依赖解析
 
@@ -266,7 +266,7 @@ node -e "const fs=require('fs');fs.mkdirSync('node_modules/@deepseek-ai',{recurs
 
 ## 项目来源与致谢
 
-- 本仓库（[gaolin89898/dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)）是 [yumusb/dsh-opencode-go-usage](https://github.com/yumusb/dsh-opencode-go-usage) 的 fork 线（早前也曾以 `Astervolans/dsh-opencode-go-usage` 存在）。包名沿用上游的 `@astervolans/dsh-opencode-go-usage`（`package.json` 的 `name` 未改，本地安装的解析名就是它）；**本仓库不发布 npm**——npm 上留有历史版本 1.5.0，新功能请从本地源码目录安装。
+- 本仓库（[gaolin89898/dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)）是 [yumusb/dsh-opencode-go-usage](https://github.com/yumusb/dsh-opencode-go-usage) 的 fork 线（早前也曾以 `Astervolans/dsh-opencode-go-usage` 存在）。包名沿用上游的 `@astervolans/dsh-opencode-go-usage`（`package.json` 的 `name` 未改，本地安装的解析名就是它）；**本仓库不发布 npm**——npm 上留有历史版本 1.3.2–1.5.0，新功能请从本地源码目录安装。版本线在 fork 处重启：本源码树为 **1.0.0**。
 - 设置命名空间、HTTP 路由与命令名保持 `dsh-opencode-go-usage` 不变，从上游迁移无需改配置。
 - 相对上游的差异：每条用量条下的**时间条**；**跟随当前服务**的多服务额度 / 余额显示；1.6.0 的**额度来源**（读取 `dsh-opencode-go` 当前账号）与应用包设置页。
 

@@ -1,4 +1,4 @@
-// Config schema coverage for the 1.6.0 `quotaSource` field.
+// Config schema coverage for the `quotaSource` field (1.0.0 source tree).
 //
 // Uses the real exported `Config` and the loader's own validation entry point
 // (`Config["~standard"].validate`), exactly like the smoke harness: this is the
