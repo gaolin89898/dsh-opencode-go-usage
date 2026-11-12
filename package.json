@@ -42,7 +42,7 @@
       "platform": "web"
     }
   },
-  "repository": "github:Astervolans/dsh-opencode-go-usage",
+  "repository": "github:gaolin89898/dsh-usage-meter",
   "publishConfig": {
     "access": "public"
   }
