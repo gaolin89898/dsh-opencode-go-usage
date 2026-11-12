@@ -209,7 +209,7 @@ DSH `0.1.7-rc` 起通过官方 client-modules 扫描装载组件：包的 `dsh.c
 
 | 插件版本 | DSH 运行时 | host 端 | 浏览器端 |
 |---|---|---|---|
-| **1.0.0**（本源码树；版本线独立重启，能力等同此前源码树的 1.6.0） | `0.1.7` 及以上，含 `0.2.x` 线（已在 `0.2.2-rc.2` 验证） | 同 1.5.0，另加经 `opencodeGoUsage` 的额度来源探测、多服务跟随，以及 `GET` / `POST /opencode-go/settings` 路由 | 同 1.5.0，另加 `plugins.bundle.config` 槽位注册（应用包设置页）与账号 / 回退显示 |
+| **1.0.0**（本源码树） | `0.1.7` 及以上，含 `0.2.x` 线（已在 `0.2.2-rc.2` 验证） | 同 1.5.0，另加经 `opencodeGoUsage` 的额度来源探测、多服务跟随，以及 `GET` / `POST /opencode-go/settings` 路由 | 同 1.5.0，另加 `plugins.bundle.config` 槽位注册（应用包设置页）与账号 / 回退显示 |
 | 1.5.0 | `0.1.7` 及以上，含 `0.2.0` 线 | loader 读取导出的 `Config` schema；配置取自插件条目（不再调用 `ctx.settings.register` / `settings.get`） | 由 client-modules 依据包的 `dsh.client` 声明自动装配 |
 | 1.4.0 | `0.1.7-rc.1`、`0.1.7-rc.2` | 同 1.5.0 | 同 1.5.0 |
 | 1.3.3 | `0.1.1-rc.2`、`0.1.2-alpha.2`（`0.1.7` 之前的版本线） | `ctx.settings.register` 注册命名空间 + `ctx.settings.get` 读取 | 自托管 bundle 路由 + `webServer.tapIndex` 注入启动图行 |
@@ -262,7 +262,7 @@ node -e "const fs=require('fs');fs.mkdirSync('node_modules/@deepseek-ai',{recurs
 - **小组件显示错误串** → 悬停收起态徽标，或展开态小组件里的错误行。
 - **装了 `dsh-opencode-go` 但仍回退到内置** → `curl -s http://127.0.0.1:3080/opencode-go/usage` 看 `source`、`fallback` 与 `opencodeGo` 块，按 `fallback.reason` 处理（见[回退原因](#回退原因)）。不想让它探测就设 `quotaSource: builtin`。
 - **小组件标题没有账号名** → 正常现象：`dsh-opencode-go` 缺失（回退）或其当前账号没有 `name`；可看接口里的 `account.name` 确认。
-- **启动失败，日志有 `Identifier 'PACKAGE_NAME' has already been declared`** → 客户端 bundle 在 shell 的共享脚本作用域里声明了顶层同名常量（与 `@astervolans/dsh-literature-search` 等插件冲突），整个 web boot 会被判定失败。1.6.x 当前源码已把该名称移入 factory 内部；重新安装本源码并完全重启 DSH 即可。若同时使用 `dsh-literature-search`，也请确保它来自当前版本。
+- **启动失败，日志有 `Identifier 'PACKAGE_NAME' has already been declared`** → 客户端 bundle 在 shell 的共享脚本作用域里声明了顶层同名常量（多个 client 插件同名冲突时会发生），整个 web boot 会被判定失败。当前源码已把该名称移入 factory 内部；重新安装本源码并完全重启 DSH 即可。
 
 ## License
 
