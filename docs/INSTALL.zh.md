@@ -1,12 +1,11 @@
 # 安装与升级 · 使用者指南
 
-给"想用这个插件的人"看的傻瓜式安装步骤。全程不需要写代码。（对应仓库 [gaolin89898/dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)，npm 包名 `@astervolans/dsh-opencode-go-usage`。）
+给"想用这个插件的人"看的傻瓜式安装步骤。全程不需要写代码。（对应仓库 [gaolin89898/dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)。本仓库**不发布 npm**，一律从本地源码目录安装；包名沿用上游的 `@astervolans/dsh-opencode-go-usage`。）
 
 > 插件并非 OpenCode GO 专用：装好后它会跟随会话当前所用服务，显示 OpenCode GO / MiniMax 的用量，或 DeepSeek / OpenRouter / Moonshot 的余额——后者直接复用你在 DSH 里已配置的凭据，无需额外设置。本指南以 OpenCode GO 为主线。
 
 > 本指南对应 **1.6.0 源码树**:小组件可以选择额度来源——默认跟随 `dsh-opencode-go` 插件的
-> **当前账号**,读不到时自动回退到 DSH 内置提供商。1.6.0 **尚未发布到 npm**(没有发布版本、
-> 没有 tag),所以请按第 1 步的命令,从本地源码目录安装。
+> **当前账号**,读不到时自动回退到 DSH 内置提供商。安装一律走第 1 步的本地源码目录命令。
 
 ## 前置条件
 
@@ -29,8 +28,7 @@
 dsh plugin --profile web add /path/to/dsh-usage-meter
 ```
 
-> - 如果你装的是**已发布版本**(1.5.0),把路径换成包名:
->   `dsh plugin --profile web add @astervolans/dsh-opencode-go-usage`
+> - 本仓库不发布 npm(npm 上留有旧版 1.5.0,不含新功能),一律用本地目录安装
 > - 如果提示 `pnpm not found`,先执行 `corepack enable` 启用 pnpm 再试
 > - 这条命令会自动完成注册,不需要手动改任何配置文件
 

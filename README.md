@@ -4,10 +4,7 @@
 
 `DSH ≥ 0.1.7` · `MIT License` · `● v1.6.0 · 源码树`
 
-> [!WARNING]
-> **1.6.0 尚未发布 npm**——「额度来源」与设置页只存在于本源码树；npm 上仍为 1.x（1.5.0）。从本地目录安装即可试用，见 [01 快速开始](#01-快速开始)。
-
-> npm 发布名仍为 `@astervolans/dsh-opencode-go-usage`（沿袭上游命名；设置命名空间、HTTP 路由与命令名也保持不变），来源见[项目来源与致谢](#项目来源与致谢)。
+本仓库**不发布 npm**，安装一律从本地源码目录——见 [01 快速开始](#01-快速开始)。
 
 第一次装 DSH 插件？直接看[使用者指南](docs/INSTALL.zh.md)，一步步照做即可。
 
@@ -15,9 +12,9 @@
 
 <div align="right"><sub>QUICK START</sub></div>
 
-三步，从安装到看到第一条用量。1.6.0 请从本地源码目录安装，包名需可解析。
+三步，从安装到看到第一条用量。
 
-**本地源码（1.6.0，全部功能）**
+**从本地源码目录安装**
 
 ```bash
 # install into the web profile
@@ -28,12 +25,6 @@ OPENCODE_GO_API_KEY: sk-...
 
 # restart the web service
 $ dsh web
-```
-
-**npm 1.x（1.5.0，不含额度来源）**
-
-```bash
-dsh plugin --profile web add @astervolans/dsh-opencode-go-usage
 ```
 
 1. **安装到 web profile** —— `--profile web` 添加本地目录（desktop 同理，换成你实际用的 profile 名）；依赖 pnpm，没有就先 `corepack enable`。`dsh plugin add` 会自动把包的 `dsh.bundle.patch` 合并进 profile 的 bundle 层栈，不需要手改 cordis.patch.yml，也不需要软链。
@@ -138,7 +129,7 @@ dsh plugin --profile web add @astervolans/dsh-opencode-go-usage
 | `apiKeyEnv` | `OPENCODE_GO_API_KEY` | API key 的 credential 引用 / 环境变量名（内置路径；`opencode-go` 模式回退时也用它） |
 | `baseUrl` | `https://opencode.ai/zen/go` | 网关 base URL（内置路径） |
 | `cacheMs` | `30000` | host 端上游缓存 TTL |
-| `updateCheck` | `true` | 检查 npm 新版本（组件与命令只提示，插件不会自行升级） |
+| `updateCheck` | `true` | 检查 npm 新版本（组件与命令只提示，插件不会自行升级）；本仓库不再发布 npm，源码安装（1.6.0）高于 npm 上的 1.5.0，该检查不会命中 |
 | `injectSessionHeader` | `true` | 为 GO 网关聊天请求注入运行时 `x-opencode-session` 头 |
 
 也可以直接在 profile patch 里配置：
@@ -151,36 +142,6 @@ dsh plugin --profile web add @astervolans/dsh-opencode-go-usage
 ```
 
 > volatile 标记需要 schemastery ≥ `3.18.4`；profile 里若 hoist 着旧副本（3.18.2），插件照常启用并从条目读配置，只是不生成设置页、不能热改。详见[兼容性](#兼容性)。
-
-## 安装与升级
-
-### 从 npm 注册表安装（已发布版本，1.5.0）
-
-```bash
-dsh plugin --profile web add @astervolans/dsh-opencode-go-usage
-```
-
-### 从 GitHub Packages 安装（镜像）
-
-每次发布也会自动同步到 [GitHub Packages](https://npm.pkg.github.com)。该注册表**即使对公开包也要求认证**，先在 `.npmrc`（项目级或 `~/.npmrc`）写入至少有 `read:packages` 权限的 PAT：
-
-```
-@astervolans:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=你的_GITHUB_PAT
-```
-
-再执行与上面相同的 `dsh plugin --profile web add @astervolans/dsh-opencode-go-usage`。两点提醒：
-
-- GitHub 上的包**默认 private**（仓库公开也一样），首次发布后需在包设置页手动改为 public（Danger Zone → Change visibility）；
-- 安装需要 token，所以 npmjs.org（无需 token）始终是更省事的主路，GitHub Packages 是镜像而非替代。
-
-### 版本不匹配时
-
-DSH 会在条目启用前按 `peerDependencies` 校验当前运行时（见[兼容性](#兼容性)）。运行时不在支持范围内时，请改装对应版本的插件，或显式接受风险后重启：
-
-```bash
-dsh plugin allow-version     # 为 name@version 在本 dsh 版本上授予精确版本豁免
-```
 
 ## HTTP 接口
 
@@ -264,7 +225,11 @@ DSH `0.1.7-rc` 起通过官方 client-modules 扫描装载组件：包的 `dsh.c
 
 `dsh-opencode-go` 本身是**可选**的，也没有声明为依赖：`opencode-go` 模式下 host 运行时探测它，没有安装属于正常回退（`not-installed`），不是错误。想让小组件跟随其当前账号，就在同一个 profile 里装上它。
 
-DSH 会在条目启用前用该范围校验当前运行时。从 `0.2.0` 起这是**硬闸门**：所有 `@deepseek-ai/dsh` / `@deepseek-ai/dsh-*` peer 都会带 `includePrerelease` 参与判定，不匹配则**整行被禁用**（宿主日志写 `disabling profile plugin row …`），而不是半死不活地跑着。因此窗口写成 `>=0.1.7-rc.1 <0.3.0`，同时覆盖 `0.1.7` 线与整条 `0.2.0` 线；1.4.0 的写法 `0.1.7-rc.1 || 0.1.7-rc.2` 做不到——任何 `0.1.x` 范围的上界都是 `<0.2.0`。若运行时不在此列，见[安装与升级 · 版本不匹配时](#版本不匹配时)。
+DSH 会在条目启用前用该范围校验当前运行时。从 `0.2.0` 起这是**硬闸门**：所有 `@deepseek-ai/dsh` / `@deepseek-ai/dsh-*` peer 都会带 `includePrerelease` 参与判定，不匹配则**整行被禁用**（宿主日志写 `disabling profile plugin row …`），而不是半死不活地跑着。因此窗口写成 `>=0.1.7-rc.1 <0.3.0`，同时覆盖 `0.1.7` 线与整条 `0.2.0` 线；1.4.0 的写法 `0.1.7-rc.1 || 0.1.7-rc.2` 做不到——任何 `0.1.x` 范围的上界都是 `<0.2.0`。若运行时不在此列，请改装对应版本的插件，或显式接受风险后重启：
+
+```bash
+dsh plugin allow-version     # 为 name@version 在本 dsh 版本上授予精确版本豁免
+```
 
 在受支持版本上还有三点运行时说明：
 
@@ -301,7 +266,7 @@ node -e "const fs=require('fs');fs.mkdirSync('node_modules/@deepseek-ai',{recurs
 
 ## 项目来源与致谢
 
-- 本仓库（[gaolin89898/dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)）是 [yumusb/dsh-opencode-go-usage](https://github.com/yumusb/dsh-opencode-go-usage) 的 fork 线（早前也曾以 `Astervolans/dsh-opencode-go-usage` 存在），npm 包名仍为 `@astervolans/dsh-opencode-go-usage`。
+- 本仓库（[gaolin89898/dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)）是 [yumusb/dsh-opencode-go-usage](https://github.com/yumusb/dsh-opencode-go-usage) 的 fork 线（早前也曾以 `Astervolans/dsh-opencode-go-usage` 存在）。包名沿用上游的 `@astervolans/dsh-opencode-go-usage`（`package.json` 的 `name` 未改，本地安装的解析名就是它）；**本仓库不发布 npm**——npm 上留有历史版本 1.5.0，新功能请从本地源码目录安装。
 - 设置命名空间、HTTP 路由与命令名保持 `dsh-opencode-go-usage` 不变，从上游迁移无需改配置。
 - 相对上游的差异：每条用量条下的**时间条**；**跟随当前服务**的多服务额度 / 余额显示；1.6.0 的**额度来源**（读取 `dsh-opencode-go` 当前账号）与应用包设置页。
 
