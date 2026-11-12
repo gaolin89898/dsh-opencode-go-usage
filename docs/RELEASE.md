@@ -1,7 +1,8 @@
 # 发布流程（维护者）
 
-> 本文档针对 **fork `Astervolans/dsh-opencode-go-usage`**，发布到 scoped 包名
-> **`@astervolans/dsh-opencode-go-usage`**。
+> 本文档针对 **本仓库 `gaolin89898/dsh-usage-meter`**（原名 `gaolin89898/dsh-opencode-go-usage`，
+> 线系 fork 自 `yumusb/dsh-opencode-go-usage`，早前 fork 线为 `Astervolans/dsh-opencode-go-usage`），
+> 发布到 scoped 包名 **`@astervolans/dsh-opencode-go-usage`**。
 >
 > 上游 `yumusb/dsh-opencode-go-usage` 发布的是无 scope 的 `dsh-opencode-go-usage`，
 > 该包名不属于本 fork，本 fork **无法**也**不应**向其发布。
@@ -91,13 +92,17 @@ trusted publisher 按仓库绑定的限制 —— 这是 npmjs 手动发布之�
   `@astervolans:registry=https://npm.pkg.github.com/`，默认 registry 仍是 npmjs.org。
   仓库里**刻意不放** `.npmrc` —— 那会把这个 scope 的 `npm publish` 也劫持到
   GitHub Packages，破坏下面这套本地 npmjs 发布流程。
-- **首次发布后要手动改可见性**：包默认 private，改 public 的位置是
-  `https://github.com/users/Astervolans/packages/npm/dsh-opencode-go-usage/settings`
+- **首次发布后要手动改可见性**：包默认 private，改 public 的位置是包设置页
+  `https://github.com/users/<发布账号>/packages/npm/dsh-opencode-go-usage/settings`
   → Danger Zone → Change visibility。
+  注意：GitHub Packages 的 npm scope 是**按仓库 owner 推导**的（工作流里
+  `Astervolans` → `@astervolans`），在本仓库发布镜像包的实际 scope 是
+  `@gaolin89898/...`，与 npmjs.org 上的 `@astervolans/...` 不同名 —— 镜像和
+  正式包不是同一个 npm 身份。
 - GitHub Packages 即使对公开包也**要求认证**（PAT + `read:packages`），所以它更适合
   当镜像/备份，普通用户仍建议走 npmjs.org。
 - **可选**：把 npmjs 发布也搬进 CI —— 在 npmjs 上给本包配置 trusted publisher
-  （仓库 `Astervolans/dsh-opencode-go-usage`，工作流文件 `release-package.yml`），
+  （仓库 `gaolin89898/dsh-usage-meter`，工作流文件 `release-package.yml`），
   再把仓库变量 `NPMJS_TRUSTED_PUBLISHING` 设为 `true`；那之后 `publish-npmjs`
   作业才会参与发布（默认跳过，不会让 Release 变红）。
 
