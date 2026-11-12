@@ -1,6 +1,6 @@
-# @astervolans/dsh-opencode-go-usage 使用者指南
+# 安装与升级 · 使用者指南
 
-给"想用这个插件的人"看的傻瓜式安装步骤。全程不需要写代码。
+给"想用这个插件的人"看的傻瓜式安装步骤。全程不需要写代码。（对应仓库 [gaolin89898/dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)，npm 包名 `@astervolans/dsh-opencode-go-usage`。）
 
 > 本指南对应 **1.6.0 源码树**:小组件可以选择额度来源——默认跟随 `dsh-opencode-go` 插件的
 > **当前账号**,读不到时自动回退到 DSH 内置提供商。1.6.0 **尚未发布到 npm**(没有发布版本、
@@ -24,7 +24,7 @@
 
 ```bash
 # 1.6.0(本源码树)用本地目录安装:
-dsh plugin --profile web add /path/to/dsh-opencode-go-usage
+dsh plugin --profile web add /path/to/dsh-usage-meter
 ```
 
 > - 如果你装的是**已发布版本**(1.5.0),把路径换成包名:
