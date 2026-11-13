@@ -210,15 +210,35 @@ test("quota above 100 stays visible while its meter clamps at 100", () => {
 	assert.equal(view.find("ocg-fill")[0].props.style.width, "100%");
 });
 
-test("loading and failure states offer status and retry without false zeroes", () => {
+test("a first-load failure shows the error state without inventing numbers", () => {
 	const loading = renderWidget();
 	assert.equal(loading.find("ocg-skeleton").length, 1);
 	assert.equal(loading.find("ocg-monthly-value").length, 0);
-	const failed = renderWidget({ data: widgetData(), error: "gateway 502" });
+	const failed = renderWidget({ error: "gateway 502" });
 	assert.equal(failed.find("ocg-error")[0].props.role, "alert");
 	assert.equal(failed.find("ocg-retry").length, 1);
 	assert.equal(failed.find("ocg-meter").length, 0);
+	assert.equal(failed.find("ocg-error-stale").length, 0);
 	assert.ok(failed.text.includes("gateway 502"));
+});
+
+test("a failed poll keeps the last good reading visible and marks it stale", () => {
+	const failed = renderWidget({ data: widgetData(), error: "gateway 502" });
+	assert.equal(failed.find("ocg-error")[0].props.role, "alert");
+	assert.equal(failed.find("ocg-retry").length, 1);
+	assert.ok(failed.text.includes("gateway 502"));
+	// The previous numbers stay on screen instead of blanking to the error card.
+	assert.equal(failed.find("ocg-monthly-value")[0].props.children, "63%");
+	assert.equal(failed.find("ocg-meter").length, 3);
+	assert.equal(failed.find("ocg-error-stale").length, 1);
+});
+
+test("a failed poll keeps the collapsed rail showing the last value", () => {
+	const stale = renderWidget({ data: widgetData(), error: "gateway 502", wide: false });
+	assert.equal(stale.find("ocg-rail-value")[0].props.children, "63%");
+	assert.ok(stale.find("ocg-rail")[0].props.title.includes("gateway 502"));
+	const empty = renderWidget({ error: "gateway 502", wide: false });
+	assert.equal(empty.find("ocg-rail-value")[0].props.children, "!");
 });
 
 test("fallback and update information fit in dedicated header and footer positions", () => {

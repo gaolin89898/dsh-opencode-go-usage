@@ -9,6 +9,7 @@ import {
 	credentials,
 	goEntry,
 	installWire,
+	jsonResponse,
 	loadHost,
 	makeCtx,
 	usagePayload,
@@ -188,8 +189,8 @@ test("service.read() throwing falls back to builtin with read-failed and the err
 	assert.equal(service.calls, 1);
 });
 
-test("an invalid service payload falls back with reason invalid-response", async () => {
-	const service = usageService(() => ({ rolling: { percent: 1 } })); // no weekly/monthly
+test("a service payload with no usable window falls back with reason invalid-response", async () => {
+	const service = usageService(() => ({ rolling: {}, weekly: {}, monthly: {} }));
 	const { routes } = boot({
 		entries: [goEntry()],
 		service,
@@ -200,7 +201,7 @@ test("an invalid service payload falls back with reason invalid-response", async
 	assert.equal(res.status, 200);
 	assert.equal(res.body.source, "builtin");
 	assert.equal(res.body.fallback.reason, "invalid-response");
-	assert.match(res.body.fallback.message, /weekly/);
+	assert.match(res.body.fallback.message, /no usable window/);
 });
 
 test("quotaSource=builtin never reads the opencode-go service", async () => {
@@ -263,6 +264,58 @@ test("builtin network failure also counts as a second failure for the 502 body",
 	assert.equal(res.status, 502);
 	assert.ok(res.body.error.includes("service down"));
 	assert.ok(res.body.error.includes("gateway unreachable"));
+});
+
+test("normalizeUsagePayload projects missing windows as null and rejects an empty payload", () => {
+	const projected = host.normalizeUsagePayload(usagePayload({ rolling: { status: "ok" } }));
+	assert.equal(projected.rolling, null);
+	assert.equal(projected.weekly.percent, 34);
+	assert.equal(host.normalizeUsagePayload(usagePayload({ rolling: null })).rolling, null);
+	assert.throws(() => host.normalizeUsagePayload({ usage: {} }), /no usable window/);
+	assert.throws(() => host.normalizeUsagePayload(null), /no usable window/);
+});
+
+test("a gateway that omits one window does not blank the whole reading", async () => {
+	const { routes } = boot({
+		entries: [goEntry()],
+		service: usageService(() => flatUsage({ rolling: null })),
+		credentialMap: { OPENCODE_API_KEY: "sk-test" }
+	});
+	const res = await callRoute(routes, "/opencode-go/usage");
+	assert.equal(res.status, 200);
+	assert.equal(res.body.source, "opencode-go");
+	assert.equal(res.body.usage.rolling, null);
+	assert.equal(res.body.usage.weekly.percent, 72);
+	assert.equal(res.body.usage.monthly.percent, 73);
+});
+
+test("a transient gateway failure is retried once before surfacing", async () => {
+	const { routes } = boot({ credentialMap: { OPENCODE_GO_API_KEY: "sk-test" } });
+	let attempts = 0;
+	globalThis.fetch = async (input) => {
+		const url = String(input);
+		if (url.includes("/v1/usage")) {
+			attempts += 1;
+			if (attempts === 1) return new Response("busy", { status: 503 });
+			return jsonResponse(usagePayload());
+		}
+		return jsonResponse({ tag_name: "v0.0.1", draft: false, prerelease: false });
+	};
+	const res = await callRoute(routes, "/opencode-go/usage");
+	assert.equal(res.status, 200);
+	assert.equal(attempts, 2);
+	assert.equal(res.body.usage.rolling.percent, 12);
+});
+
+test("a non-transient gateway status is not retried", async () => {
+	const { wire, routes } = boot({
+		credentialMap: { OPENCODE_GO_API_KEY: "sk-test" },
+		wire: { usageStatus: 401 }
+	});
+	const res = await callRoute(routes, "/opencode-go/usage");
+	assert.equal(res.status, 502);
+	assert.ok(res.body.error.includes("gateway 401"));
+	assert.equal(wire.requests.filter((request) => request.url.includes("/v1/usage")).length, 1);
 });
 
 test("cache: switching quotaSource does not serve the previous source's result", async () => {
