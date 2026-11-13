@@ -63,6 +63,10 @@ test("the bundle registers under the package name", () => {
 	assert.ok(captured !== null, "window.__ModuleLoader__.load was called");
 	assert.equal(captured.id, pkg.name);
 	assert.equal(typeof captured.factory, "function");
+	assert.equal(host.name, pkg.name);
+	const patch = readFileSync(path.resolve("cordis.patch.yml"), "utf8");
+	assert.ok(patch.includes(`name: "${pkg.name}"`), "the profile can resolve the renamed package");
+	assert.ok(patch.includes(`id: ${host.namespace}`), "existing settings overrides retain their entry id");
 });
 
 test("apply registers the sidebar widget and the Plugins-panel config page", () => {
@@ -225,6 +229,7 @@ test("fallback and update information fit in dedicated header and footer positio
 	assert.equal(view.find("ocg-fallback").length, 1);
 	assert.equal(view.find("ocg-source")[0].props.children, "widget.source.builtin");
 	assert.equal(view.find("ocg-update")[0].props.children, "v1.7.1");
+	assert.equal(view.find("ocg-update")[0].props.href, "https://github.com/gaolin89898/dsh-usage-meter/releases/latest");
 	const explicit = renderWidget({ data: widgetData({ source: "builtin", fallback: null }) });
 	assert.equal(explicit.find("ocg-fallback").length, 0);
 });

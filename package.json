@@ -1,7 +1,7 @@
 {
-  "name": "@astervolans/dsh-opencode-go-usage",
-  "version": "1.0.0",
-  "description": "DSH (DeepSeek Harness) plugin: OpenCode GO plan quota widget in the sidebar, dsh-opencode-go current-account quota source with built-in-provider fallback, a Plugins-panel settings page, a same-origin usage proxy, and a /opencode-go chat command (DSH 0.1.7+ and 0.2.x compatible, verified on 0.2.2-rc.2)",
+  "name": "dsh-usage-meter",
+  "version": "1.0.1",
+  "description": "DSH sidebar usage meter for OpenCode GO, MiniMax, DeepSeek, OpenRouter and Moonshot, with usage windows, balances and a Plugins-panel settings page (DSH 0.1.7+ and 0.2.x).",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

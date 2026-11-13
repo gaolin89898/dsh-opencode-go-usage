@@ -1,21 +1,6 @@
-# dsh-opencode-go-usage — profile bundle patch.
-#
-# `dsh plugin --profile web add @astervolans/dsh-opencode-go-usage` installs this
-# package and, because package.json declares `dsh.bundle.patch`, reconciles it
-# into the profile's `dsh.profile.bundles` layer stack automatically — no manual
-# cordis.patch.yml editing. This file is that bundle layer: it inserts the
-# plugin entry with schema defaults; user overrides live in the entry's config
-# (Settings → Plugins → Plugin configuration; DSH 2.x reads the exported
-# `Config` schema by itself and volatile fields hot-apply).
-#
-# `name` MUST be the package's resolvable module specifier: the cordis loader
-# imports exactly this string from the profile directory, where only the scoped
-# package exists. Before the npm rename this file said the unscoped
-# `dsh-opencode-go-usage`, which made `dsh web` abort at startup with
-# `Cannot find package 'dsh-opencode-go-usage' imported from <profile>`.
-# The `id` stays the unscoped runtime id so the settings namespace
-# (`dsh-opencode-go-usage`), the HTTP routes and the /opencode-go command name
-# keep working after the rename.
+# dsh-usage-meter — automatically installed profile bundle layer.
+# Keep the entry id stable so existing configuration overrides still apply.
+# The module name must match package.json, not the legacy entry id.
 - insert:
     - id: dsh-opencode-go-usage
-      name: "@astervolans/dsh-opencode-go-usage"
+      name: "dsh-usage-meter"

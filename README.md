@@ -2,7 +2,7 @@
 
 **[dsh-usage-meter](https://github.com/gaolin89898/dsh-usage-meter)** 是 [DSH](https://github.com/deepseek-ai/deepseek-harness)（DeepSeek Harness）的侧边栏小组件：跟随会话当前所用服务，实时显示对应的额度或余额——OpenCode GO 的 5 小时 / 周 / 月用量窗口，MiniMax 的滚动与周用量，DeepSeek / OpenRouter / Moonshot 的可用余额。每条用量条下再叠一条时间条——额度花得快还是慢，一眼可见。
 
-`DSH ≥ 0.1.7` · `MIT License` · `● v1.0.0`
+`DSH ≥ 0.1.7` · `MIT License` · `● v1.0.1`
 
 第一次装 DSH 插件？直接看[使用者指南](docs/INSTALL.zh.md)，一步步照做即可。
 
@@ -24,6 +24,10 @@ OPENCODE_GO_API_KEY: sk-...
 # restart the web service
 $ dsh web
 ```
+
+也可以从 [v1.0.1 Release](https://github.com/gaolin89898/dsh-usage-meter/releases/tag/v1.0.1) 下载 `dsh-usage-meter-1.0.1.tgz`，执行 `dsh plugin --profile web add ./dsh-usage-meter-1.0.1.tgz` 安装。npm 上的同名包属于其他项目，请使用本仓库的安装包或源码目录。
+
+升级旧版本：本地目录安装的用户先更新源码，再对同一目录执行安装命令。包名已改为 `dsh-usage-meter`，配置 entry id 保持不变；请确认插件面板只启用一份用量组件，完整退出 DSH 后再启动并硬刷新。
 
 1. **安装到 web profile** —— `--profile web` 添加本地目录（desktop 同理，换成你实际用的 profile 名）；依赖 pnpm，没有就先 `corepack enable`。`dsh plugin add` 会自动把包的 `dsh.bundle.patch` 合并进 profile 的 bundle 层栈，不需要手改 cordis.patch.yml，也不需要软链。
 2. **写入 API key** —— 在 `~/.dsh/.credentials.yaml` 里加一行 `OPENCODE_GO_API_KEY: sk-...`，key 在 [opencode.ai/auth](https://opencode.ai/auth) 创建。即使走默认的 `dsh-opencode-go` 来源也要配好这一步：一旦回退到内置提供商，用的正是这个 credential。
@@ -107,7 +111,7 @@ $ dsh web
 
 ### 设置页
 
-插件在 DSH 官方 **`plugins.bundle.config`** 槽位注册了配置页，以包名为 key：**侧栏 →「插件」面板 → `@astervolans/dsh-opencode-go-usage` 卡片 → 配置页**。
+插件在 DSH 官方 **`plugins.bundle.config`** 槽位注册了配置页，以包名为 key：**侧栏 →「插件」面板 → `dsh-usage-meter` 卡片 → 配置页**。
 
 页面提供：
 
@@ -127,7 +131,7 @@ $ dsh web
 | `apiKeyEnv` | `OPENCODE_GO_API_KEY` | API key 的 credential 引用 / 环境变量名（内置路径；`opencode-go` 模式回退时也用它） |
 | `baseUrl` | `https://opencode.ai/zen/go` | 网关 base URL（内置路径） |
 | `cacheMs` | `30000` | host 端上游缓存 TTL |
-| `updateCheck` | `false` | 检查 npm 新版本（组件与命令只提示，插件不会自行升级） |
+| `updateCheck` | `false` | 检查本仓库 GitHub Releases 新版本（组件与命令只提示，插件不会自行升级） |
 | `injectSessionHeader` | `true` | 为 GO 网关聊天请求注入运行时 `x-opencode-session` 头 |
 
 也可以直接在 profile patch 里配置：
@@ -242,7 +246,7 @@ dsh plugin allow-version     # 为 name@version 在本 dsh 版本上授予精确
 node -e "const fs=require('fs');fs.mkdirSync('node_modules/@deepseek-ai',{recursive:true});fs.symlinkSync(process.env.USERPROFILE+'/.dsh/profiles/<profile>/node_modules/@deepseek-ai/schemastery','node_modules/@deepseek-ai/schemastery','junction')"
 ```
 
-`node_modules/` 已在 `.gitignore` 中，不会进入仓库。验证：`node --input-type=module -e "await import('@astervolans/dsh-opencode-go-usage')"`（在 profile 目录执行）。
+`node_modules/` 已在 `.gitignore` 中，不会进入仓库。验证：`node --input-type=module -e "await import('dsh-usage-meter')"`（在 profile 目录执行）。
 
 ## 常见问题
 

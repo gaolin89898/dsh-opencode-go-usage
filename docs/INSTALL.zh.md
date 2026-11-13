@@ -4,8 +4,8 @@
 
 > 插件并非 OpenCode GO 专用：装好后它会跟随会话当前所用服务，显示 OpenCode GO / MiniMax 的用量，或 DeepSeek / OpenRouter / Moonshot 的余额——后者直接复用你在 DSH 里已配置的凭据，无需额外设置。本指南以 OpenCode GO 为主线。
 
-> 本指南对应 **1.0.0**:小组件可以选择额度来源——默认跟随 `dsh-opencode-go` 插件的
-> **当前账号**,读不到时自动回退到 DSH 内置提供商。安装一律走第 1 步的本地源码目录命令。
+> 本指南对应 **1.0.1**:小组件可以选择额度来源——默认跟随 `dsh-opencode-go` 插件的
+> **当前账号**,读不到时自动回退到 DSH 内置提供商。
 
 ## 前置条件
 
@@ -24,11 +24,17 @@
 在终端执行:
 
 ```bash
-# 1.0.0 用本地目录安装:
+# 从本地源码目录安装:
 dsh plugin --profile web add /path/to/dsh-usage-meter
 ```
 
-> - 一律用本地目录安装
+也可以从 [GitHub Release](https://github.com/gaolin89898/dsh-usage-meter/releases/tag/v1.0.1) 下载 `dsh-usage-meter-1.0.1.tgz`，然后执行：
+
+```bash
+dsh plugin --profile web add ./dsh-usage-meter-1.0.1.tgz
+```
+
+> - npm 上的 `dsh-usage-meter` 是其他项目，请使用本仓库的安装包或源码目录
 > - 如果提示 `pnpm not found`,先执行 `corepack enable` 启用 pnpm 再试
 > - 这条命令会自动完成注册,不需要手动改任何配置文件
 
@@ -63,7 +69,7 @@ key 在哪拿:登录 [opencode.ai/auth](https://opencode.ai/auth),在账户页�
 默认值(`opencode-go`:优先跟随 `dsh-opencode-go`)不需要任何设置。想确认或切换:
 
 1. 打开侧边栏的 **「插件」** 面板
-2. 找到 **`@astervolans/dsh-opencode-go-usage`** 的卡片,点开它的**配置页**
+2. 找到 **`dsh-usage-meter`** 的卡片,点开它的**配置页**
 3. 在两个选项里选一个,然后点**保存**:
    - **优先 dsh-opencode-go(当前账号)** —— 默认;读不到时自动回退内置
    - **DSH 内置提供商** —— 始终用 `baseUrl` + `/v1/usage`,完全不探测 `dsh-opencode-go`

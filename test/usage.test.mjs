@@ -17,6 +17,42 @@ import {
 
 const host = await loadHost();
 
+test("disabled update checks do not contact a release registry", async () => {
+	const { wire, routes } = boot({ service: usageService(() => flatUsage()), entries: [goEntry()] });
+	await callRoute(routes, "/opencode-go/usage");
+	assert.equal(wire.requests.length, 0);
+});
+
+test("update checks use this repository's release tag and cache the result", async () => {
+	const { wire, routes } = boot({
+		config: { updateCheck: true }, entries: [goEntry()], service: usageService(() => flatUsage()),
+		wire: { registry: { tag_name: "v9.0.0", draft: false, prerelease: false } }
+	});
+	await new Promise((resolve) => setImmediate(resolve));
+	const res = await callRoute(routes, "/opencode-go/usage");
+	assert.equal(res.body.update.available, true);
+	assert.equal(res.body.update.latest, "9.0.0");
+	await callRoute(routes, "/opencode-go/usage");
+	assert.equal(wire.requests.length, 1);
+	assert.equal(wire.requests[0].url, "https://api.github.com/repos/gaolin89898/dsh-usage-meter/releases/latest");
+});
+
+test("update checks ignore npm metadata, older versions, drafts and prereleases", async () => {
+	for (const registry of [
+		{ version: "9.0.0" }, { tag_name: "v0.1.0" },
+		{ tag_name: "v9.0.0", draft: true }, { tag_name: "v9.0.0", prerelease: true },
+		{ tag_name: "v9.0.0-rc.1" }, { tag_name: "v9.0.0/invalid" }
+	]) {
+		const { routes } = boot({
+			config: { updateCheck: true }, entries: [goEntry()], service: usageService(() => flatUsage()),
+			wire: { registry }
+		});
+		await new Promise((resolve) => setImmediate(resolve));
+		const res = await callRoute(routes, "/opencode-go/usage");
+		assert.equal(res.body.update.available, false, JSON.stringify(registry));
+	}
+});
+
 /** dsh-opencode-go's flat service shape, with distinctive percentages. */
 function flatUsage(percent = {}) {
 	return {

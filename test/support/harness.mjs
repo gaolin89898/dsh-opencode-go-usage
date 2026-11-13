@@ -52,14 +52,14 @@ export function usagePayload(overrides = {}) {
 /**
  * Install a hermetic `globalThis.fetch`.
  *
- * Answers the npm update check with an old version (so `update.available` is
+ * Answers the GitHub update check with an old version (so `update.available` is
  * always false) and `${base}/v1/usage` with the configured payload. Unknown
  * URLs throw: a test that reaches the network fails loudly.
  * @param {{ registry?: object, usage?: object, usageStatus?: number, usageError?: Error | null }} [options]
  */
 export function installWire(options = {}) {
 	const state = {
-		registry: options.registry ?? { version: "0.0.1" },
+		registry: options.registry ?? { tag_name: "v0.0.1", draft: false, prerelease: false },
 		usage: options.usage ?? usagePayload(),
 		usageStatus: options.usageStatus ?? 200,
 		usageError: options.usageError ?? null
@@ -70,7 +70,7 @@ export function installWire(options = {}) {
 		const url = String(input);
 		const record = { url, method: init?.method ?? "GET", headers: new Headers(init?.headers) };
 		requests.push(record);
-		if (url.includes("registry.npmjs.org")) return jsonResponse(state.registry);
+		if (url === "https://api.github.com/repos/gaolin89898/dsh-usage-meter/releases/latest") return jsonResponse(state.registry);
 		if (url.includes("/v1/usage")) {
 			if (state.usageError !== null) throw state.usageError;
 			return jsonResponse(state.usage, state.usageStatus);
